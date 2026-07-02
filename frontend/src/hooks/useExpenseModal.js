@@ -3,6 +3,7 @@ import { auth } from '../services/firebaseConfig';
 import {
   createExpense,
   deleteExpense,
+  getApiErrorMessage,
   updateExpense,
 } from '../services/salesforceApi';
 import { normalizeCategoryValue } from '../utils/categoryNormalize';
@@ -13,6 +14,13 @@ import { INITIAL_EXPENSE_FORM } from '../constants/expenseForm';
 const MODAL_FEEDBACK_MS = 900;
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const toDateInputValue = (value) => {
+  if (!value) return '';
+  const raw = String(value);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  return raw.split('T')[0] || raw;
+};
 
 export const useExpenseModal = ({
   contactId,
@@ -30,8 +38,18 @@ export const useExpenseModal = ({
   const [deleting, setDeleting] = useState(false);
   const [modalFeedback, setModalFeedback] = useState(null);
   const [deleteFeedback, setDeleteFeedback] = useState(null);
+  const [saveError, setSaveError] = useState('');
 
   const defaultCategory = categories[0] || 'Other';
+
+  const clearSaveError = useCallback(() => {
+    setSaveError('');
+  }, []);
+
+  const updateFormData = useCallback((next) => {
+    setSaveError('');
+    setFormData(next);
+  }, []);
 
   useEffect(() => {
     if (!categories.length || formData.Category__c) return;
@@ -40,12 +58,14 @@ export const useExpenseModal = ({
 
   const openAddModal = useCallback(() => {
     setEditingId(null);
+    setSaveError('');
     setFormData({ ...INITIAL_EXPENSE_FORM, Category__c: defaultCategory });
     setIsModalOpen(true);
   }, [defaultCategory]);
 
   const closeModal = useCallback(() => {
     if (modalFeedback || saving) return;
+    setSaveError('');
     setIsModalOpen(false);
     setEditingId(null);
     setFormData({ ...INITIAL_EXPENSE_FORM, Category__c: defaultCategory });
@@ -53,12 +73,13 @@ export const useExpenseModal = ({
 
   const openEditModal = useCallback((exp) => {
     const normalizedCategory = normalizeCategoryValue(exp.Category__c || 'Other');
+    setSaveError('');
     setEditingId(exp.Id);
     setFormData({
       Name: exp.Name,
       Amount__c: exp.Amount__c,
       Category__c: normalizedCategory,
-      Date__c: exp.Date__c,
+      Date__c: toDateInputValue(exp.Date__c),
       Is_Recurring__c: exp.Is_Recurring__c || false,
     });
     if (setCategories) {
@@ -85,8 +106,9 @@ export const useExpenseModal = ({
 
     try {
       setSaving(true);
+      setSaveError('');
       const token = await auth.currentUser?.getIdToken(true);
-      if (!token) throw new Error();
+      if (!token) throw new Error('Not authenticated');
 
       const wasEditing = Boolean(editingId);
 
@@ -106,8 +128,7 @@ export const useExpenseModal = ({
       await loadData(token, { showLoading: false });
       showToast(wasEditing ? 'Transaction updated successfully' : 'Transaction added successfully');
     } catch (err) {
-      const remoteMessage = err.response?.data?.error;
-      showToast(remoteMessage || 'Failed to process request. Please try again.', 'error');
+      setSaveError(getApiErrorMessage(err, 'Failed to save transaction'));
     } finally {
       setSaving(false);
     }
@@ -136,7 +157,7 @@ export const useExpenseModal = ({
     try {
       setDeleting(true);
       const token = await auth.currentUser?.getIdToken(true);
-      if (!token) throw new Error();
+      if (!token) throw new Error('Not authenticated');
 
       await deleteExpense(deleteTarget.id, token);
       setDeleteFeedback('delete');
@@ -146,8 +167,8 @@ export const useExpenseModal = ({
       setDeleteFeedback(null);
       await loadData(token, { showLoading: false });
       showToast('Transaction deleted successfully');
-    } catch {
-      showToast('Unable to delete transaction. Please try again.', 'error');
+    } catch (err) {
+      showToast(getApiErrorMessage(err, 'Unable to delete transaction. Please try again.'), 'error');
       setDeleteFeedback(null);
     } finally {
       setDeleting(false);
@@ -158,7 +179,9 @@ export const useExpenseModal = ({
     isModalOpen,
     editingId,
     formData,
-    setFormData,
+    setFormData: updateFormData,
+    saveError,
+    clearSaveError,
     deleteTarget,
     saving,
     deleting,

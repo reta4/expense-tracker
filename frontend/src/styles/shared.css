@@ -900,10 +900,12 @@ body.app-fab-dragging .app-fab {
   background: rgba(7, 7, 11, 0.78);
   backdrop-filter: blur(8px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  z-index: 9999;
-  padding: 1rem;
+  z-index: 10002;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: max(0.75rem, env(safe-area-inset-top)) 1rem calc(5.5rem + env(safe-area-inset-bottom, 0px));
   animation: fadeSlideIn 0.2s ease both;
 }
 
@@ -913,9 +915,14 @@ body.app-fab-dragging .app-fab {
   border-radius: var(--radius-lg);
   width: 100%;
   max-width: 420px;
+  max-height: calc(100dvh - max(0.75rem, env(safe-area-inset-top)) - calc(5.5rem + env(safe-area-inset-bottom, 0px)) - 1rem);
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
   overflow: hidden;
   animation: popIn 0.28s ease both;
+  flex-shrink: 0;
+  margin-top: clamp(0.5rem, 4vh, 2rem);
 }
 
 .app-tx-modal-header {
@@ -923,6 +930,57 @@ body.app-fab-dragging .app-fab {
   align-items: center;
   justify-content: space-between;
   padding: 1.25rem 1.25rem 0;
+  flex-shrink: 0;
+}
+
+.app-tx-modal-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin: 1rem 1.25rem 0;
+  padding: 0.875rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.app-tx-modal-error-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #ef4444;
+}
+
+.app-tx-modal-error-message {
+  margin: 0 0 0.35rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+.app-tx-modal-error-hint {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.app-tx-modal-error-close {
+  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: none;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  font-size: 1.125rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.app-tx-modal-error-close:hover {
+  background: rgba(239, 68, 68, 0.25);
 }
 
 .app-tx-modal-title {
@@ -956,6 +1014,7 @@ body.app-fab-dragging .app-fab {
 
 .app-tx-modal-form {
   padding: 1rem 1.25rem 1.25rem;
+  overflow-y: auto;
 }
 
 .app-tx-modal-field {

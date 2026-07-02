@@ -3,7 +3,13 @@ const app = require('./app');
 const { port, validateEnv } = require('./config/env');
 
 validateEnv();
-initializeFirebaseAdmin();
+
+try {
+  initializeFirebaseAdmin();
+} catch (error) {
+  console.error('Server startup aborted due to Firebase Admin configuration error.');
+  process.exit(1);
+}
 
 app.listen(port, () => {
   console.log(`🚀 Secure Proxy server running on port ${port}`);

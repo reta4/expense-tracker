@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { getCategoryMeta } from '../../assets/categoryConfig';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 
@@ -12,19 +13,30 @@ const TransactionModal = ({
   onSubmit,
   saving = false,
   feedbackTone = null,
+  saveError = '',
+  onDismissError,
 }) => {
   const dialogRef = useRef(null);
+  const overlayRef = useRef(null);
   useFocusTrap(isOpen, dialogRef);
 
   useEffect(() => {
     if (!isOpen) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    overlayRef.current.scrollTop = 0;
 
     const onKey = (event) => {
       if (event.key === 'Escape' && !saving && !feedbackTone) onClose();
     };
 
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKey);
+    };
   }, [feedbackTone, isOpen, onClose, saving]);
 
   if (!isOpen) return null;
@@ -41,8 +53,9 @@ const TransactionModal = ({
     isLocked ? 'app-modal--locked' : '',
   ].filter(Boolean).join(' ');
 
-  return (
+  return createPortal(
     <div
+      ref={overlayRef}
       className={overlayClass}
       onClick={isLocked ? undefined : onClose}
       role="presentation"
@@ -69,6 +82,24 @@ const TransactionModal = ({
             ×
           </button>
         </div>
+
+        {saveError ? (
+          <div className="app-tx-modal-error" role="alert" aria-live="assertive">
+            <div className="app-tx-modal-error-content">
+              <p className="app-tx-modal-error-title">Could not save transaction</p>
+              <p className="app-tx-modal-error-message">{saveError}</p>
+              <p className="app-tx-modal-error-hint">Fix the issue below and try again.</p>
+            </div>
+            <button
+              type="button"
+              className="app-tx-modal-error-close"
+              onClick={onDismissError}
+              aria-label="Dismiss error"
+            >
+              ×
+            </button>
+          </div>
+        ) : null}
 
         <form className="app-tx-modal-form" onSubmit={onSubmit}>
           <div className="app-tx-modal-field">
@@ -147,7 +178,8 @@ const TransactionModal = ({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };
 

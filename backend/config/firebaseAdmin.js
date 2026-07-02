@@ -3,20 +3,85 @@ const fs = require('fs');
 const path = require('path');
 const admin = require('firebase-admin');
 
-const loadServiceAccount = () => {
-  if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
-    return JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+const REQUIRED_SERVICE_ACCOUNT_FIELDS = ['project_id', 'private_key', 'client_email'];
+
+const formatParseError = (source, error) => (
+  `Failed to parse Firebase service account JSON from ${source}: ${error.message}. `
+  + 'Ensure the value is valid JSON (for Render, paste the full service account as a single line).'
+);
+
+const assertServiceAccountShape = (serviceAccount, source) => {
+  const missingFields = REQUIRED_SERVICE_ACCOUNT_FIELDS.filter(
+    (field) => !serviceAccount?.[field],
+  );
+
+  if (missingFields.length > 0) {
+    throw new Error(
+      `Firebase service account loaded from ${source} is missing required field(s): `
+      + `${missingFields.join(', ')}.`,
+    );
   }
 
+  return serviceAccount;
+};
+
+const loadServiceAccountFromEnv = () => {
+  const rawJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON?.trim();
+
+  if (!rawJson) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(rawJson);
+    return assertServiceAccountShape(parsed, 'FIREBASE_SERVICE_ACCOUNT_JSON');
+  } catch (error) {
+    if (error.message.startsWith('Firebase service account loaded from')) {
+      throw error;
+    }
+
+    throw new Error(formatParseError('FIREBASE_SERVICE_ACCOUNT_JSON', error));
+  }
+};
+
+const loadServiceAccountFromFile = () => {
   const keyPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH
     || path.join(__dirname, '..', 'serviceAccountKey.json');
 
-  if (fs.existsSync(keyPath)) {
-    return JSON.parse(fs.readFileSync(keyPath, 'utf8'));
+  if (!fs.existsSync(keyPath)) {
+    return null;
+  }
+
+  try {
+    const fileContents = fs.readFileSync(keyPath, 'utf8');
+    const parsed = JSON.parse(fileContents);
+    return assertServiceAccountShape(parsed, keyPath);
+  } catch (error) {
+    if (error.message.startsWith('Firebase service account loaded from')) {
+      throw error;
+    }
+
+    throw new Error(formatParseError(keyPath, error));
+  }
+};
+
+const loadServiceAccount = () => {
+  const fromEnv = loadServiceAccountFromEnv();
+  if (fromEnv) {
+    return { serviceAccount: fromEnv, source: 'FIREBASE_SERVICE_ACCOUNT_JSON' };
+  }
+
+  const fromFile = loadServiceAccountFromFile();
+  if (fromFile) {
+    return {
+      serviceAccount: fromFile,
+      source: process.env.FIREBASE_SERVICE_ACCOUNT_PATH || 'serviceAccountKey.json',
+    };
   }
 
   throw new Error(
-    'Firebase Admin is not configured. Set FIREBASE_SERVICE_ACCOUNT_JSON or place serviceAccountKey.json locally.'
+    'Firebase Admin is not configured. Set FIREBASE_SERVICE_ACCOUNT_JSON for cloud deployment '
+    + 'or place serviceAccountKey.json in the backend directory for local development.',
   );
 };
 
@@ -25,12 +90,19 @@ const initializeFirebaseAdmin = () => {
     return admin;
   }
 
-  const serviceAccount = loadServiceAccount();
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
+  try {
+    const { serviceAccount, source } = loadServiceAccount();
 
-  return admin;
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
+
+    console.log(`✓ Firebase Admin initialized (${source})`);
+    return admin;
+  } catch (error) {
+    console.error('✗ Firebase Admin startup failed:', error.message);
+    throw error;
+  }
 };
 
 let firestoreProbeResult = null;

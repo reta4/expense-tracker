@@ -110,6 +110,25 @@ const getExpenseById = async (id) => {
   return response.data.records[0] || null;
 };
 
+const getContactSummary = async (contactId) => {
+  const headers = await buildAuthHeaders();
+  const safeContactId = String(contactId).trim().replace(/'/g, "\\'");
+  const soql = `SELECT Total_Expenses_This_Week__c, Total_Expenses_This_Month__c FROM Contact WHERE Id = '${safeContactId}' LIMIT 1`;
+
+  const response = await axios.get(
+    `${salesforce.instanceUrl}/services/data/${salesforce.apiVersion}/query/?q=${encodeURIComponent(soql)}`,
+    { headers }
+  );
+
+  const record = response.data.records[0];
+  if (!record) return null;
+
+  return {
+    Total_Expenses_This_Week__c: record.Total_Expenses_This_Week__c ?? 0,
+    Total_Expenses_This_Month__c: record.Total_Expenses_This_Month__c ?? 0,
+  };
+};
+
 const getContactIdByEmail = async (email) => {
   const headers = await buildAuthHeaders();
   const safeEmail = String(email).trim().toLowerCase().replace(/'/g, "\\'");
@@ -203,6 +222,7 @@ module.exports = {
   getExpenses,
   getExpenseById,
   getContactIdByEmail,
+  getContactSummary,
   getCategoryPicklistValues,
   createContact,
   createExpense,

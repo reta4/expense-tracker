@@ -3,6 +3,10 @@ const rateLimit = require('express-rate-limit');
 const { validateFirebaseToken } = require('../middleware/auth');
 const { initializeFirebaseAdmin } = require('../config/firebaseAdmin');
 const { createContact, getContactIdByEmail } = require('../services/salesforceService');
+const {
+  formatSalesforceError,
+  isSalesforceClientError,
+} = require('../utils/salesforceErrors');
 
 const router = express.Router();
 
@@ -42,6 +46,15 @@ router.post('/create-contact', authLimiter, validateFirebaseToken, async (req, r
     return res.status(201).json({ success: true, contactId });
   } catch (error) {
     console.error('Error creating Salesforce contact:', error.response?.data || error.message);
+
+    if (isSalesforceClientError(error)) {
+      const cleanSalesforceContactError = formatSalesforceError(
+        error,
+        'Failed to create Salesforce contact',
+      );
+      return res.status(400).json({ error: cleanSalesforceContactError });
+    }
+
     return res.status(500).json({ error: 'Failed to create Salesforce contact' });
   }
 });

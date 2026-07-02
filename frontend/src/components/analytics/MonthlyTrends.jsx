@@ -40,7 +40,7 @@ const MonthlyTrends = ({ barData, monthFilterOptions, filterMonth, setFilterMont
     <div className="av-card av-card--trends" style={{ animationDelay: '.1s' }}>
       <div className="av-card-header av-trends-header">
         <div className="av-trends-heading">
-          <span className="av-card-title">Monthly trends</span>
+          <span className="av-card-title">Expenses by months</span>
           <p className="av-trends-summary">
             <span className="av-trends-summary-total">{summary.total}</span>
             <span className="av-trends-summary-label">{summary.label}</span>
@@ -81,7 +81,7 @@ const MonthlyTrends = ({ barData, monthFilterOptions, filterMonth, setFilterMont
           icon="chart"
         />
       ) : (
-        <div className="av-trends-chart" role="img" aria-label="Monthly spending bar chart">
+        <div className="av-trends-chart" role="img" aria-label="Expenses by months bar chart">
           <div className="av-trends-grid" aria-hidden="true">
             {[0, 1, 2, 3].map((line) => (
               <span key={line} className="av-trends-grid-line" />
@@ -117,11 +117,7 @@ const MonthlyTrends = ({ barData, monthFilterOptions, filterMonth, setFilterMont
             })}
           </div>
 
-          <p className="av-trends-hint">
-            {hasFutureBars
-              ? 'Purple bars are planned · tap any bar to filter'
-              : 'Tap a bar to filter the dashboard by month'}
-          </p>
+          <p className="av-trends-hint">Tap any bar to filter</p>
         </div>
       )}
     </div>

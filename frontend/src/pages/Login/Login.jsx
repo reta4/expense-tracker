@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth, db } from '../../services/firebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { auth } from '../../services/firebaseConfig';
+import { fetchValidatedUserProfile, getLoginValidationError } from '../../utils/userProfile';
 import AuthCard from '../../components/auth/AuthCard';
 import AuthAlert from '../../components/auth/AuthAlert';
 import AuthForm from '../../components/auth/AuthForm';
@@ -23,14 +23,15 @@ const Login = () => {
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, cleanedEmail, password);
-      const firebaseUser = userCredential.user;
-      const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+      const profile = await fetchValidatedUserProfile(userCredential.user);
 
-      if (userDoc.exists()) {
-        navigate('/');
-      } else {
-        setError('Invalid email or password.');
+      if (!profile.valid) {
+        await signOut(auth);
+        setError(getLoginValidationError(profile.reason));
+        return;
       }
+
+      navigate('/');
     } catch {
       setError('Invalid email or password.');
     } finally {

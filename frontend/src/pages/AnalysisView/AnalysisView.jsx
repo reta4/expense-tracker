@@ -1,9 +1,9 @@
-import React, { useMemo, useEffect, useState, useRef } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../../services/firebaseConfig';
 import { getCategoryMeta } from '../../assets/categoryConfig';
-import { useExpenses } from '../../hooks/useExpenses';
-import { useAuthUser } from '../../hooks/useAuthUser';
+import { useExpenses, clearExpensesSession, hasExpensesSession } from '../../hooks/useExpenses';
+import { useAuthUser, clearAuthSession } from '../../hooks/useAuthUser';
 import { useExpenseModal } from '../../hooks/useExpenseModal';
 import { formatMoney } from '../../utils/formatMoney';
 import {
@@ -33,7 +33,6 @@ const AnalysisView = ({ dark, toggleDark }) => {
   const [filterCategory, setFilterCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
-  const dataLoaded = useRef(false);
 
   const { user, contactId, loadingAuth, resetSession } = useAuthUser(navigate);
   const {
@@ -50,6 +49,8 @@ const AnalysisView = ({ dark, toggleDark }) => {
     editingId,
     formData,
     setFormData,
+    saveError,
+    clearSaveError,
     deleteTarget,
     saving,
     deleting,
@@ -72,16 +73,17 @@ const AnalysisView = ({ dark, toggleDark }) => {
   });
 
   useEffect(() => {
-    if (!contactId || loadingAuth || dataLoaded.current) return;
-    dataLoaded.current = true;
+    if (!contactId || loadingAuth) return;
     (async () => {
-      const token = await auth.currentUser?.getIdToken(true);
-      if (token) await loadData(token, { showLoading: true });
+      const token = await auth.currentUser?.getIdToken();
+      if (!token) return;
+      await loadData(token, { showLoading: !hasExpensesSession() });
     })();
   }, [contactId, loadingAuth, loadData]);
 
   const handleLogout = () => {
-    dataLoaded.current = false;
+    clearExpensesSession();
+    clearAuthSession();
     resetSession();
     auth.signOut();
   };
@@ -222,7 +224,7 @@ const AnalysisView = ({ dark, toggleDark }) => {
     setSearchQuery('');
   };
 
-  if (loadingAuth || loadingExpenses) {
+  if (loadingAuth || (loadingExpenses && expenses.length === 0)) {
     return <PageSkeleton variant="analysis" />;
   }
 
@@ -252,6 +254,8 @@ const AnalysisView = ({ dark, toggleDark }) => {
         onSubmit={handleSubmit}
         saving={saving}
         feedbackTone={modalFeedback}
+        saveError={saveError}
+        onDismissError={clearSaveError}
       />
 
       <AnalysisSummary

@@ -5,15 +5,31 @@ import { normalizeCategoryValue } from '../utils/categoryNormalize';
 
 export { normalizeCategoryValue };
 
+let expensesSession = null;
+
+export const clearExpensesSession = () => {
+  expensesSession = null;
+};
+
+export const hasExpensesSession = () => Boolean(expensesSession);
+
 export const useExpenses = () => {
-  const [expenses, setExpenses] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [expenses, setExpenses] = useState(() => expensesSession?.expenses ?? []);
+  const [categories, setCategories] = useState(() => expensesSession?.categories ?? []);
+  const [loading, setLoading] = useState(() => !expensesSession);
   const [error, setError] = useState('');
 
   const loadData = useCallback(async (token, options = {}) => {
     const { showLoading = true } = options;
-    if (showLoading) setLoading(true);
+    const hasCache = Boolean(expensesSession);
+
+    if (hasCache && !showLoading) {
+      setExpenses(expensesSession.expenses);
+      setCategories(expensesSession.categories);
+      setLoading(false);
+    }
+
+    if (showLoading && !hasCache) setLoading(true);
     setError('');
 
     try {
@@ -25,18 +41,29 @@ export const useExpenses = () => {
         getCategoryPicklistValues(authToken),
       ]);
 
-      setExpenses(expensesData || []);
-      setCategories(categoriesData || []);
+      const nextExpenses = expensesData || [];
+      const nextCategories = categoriesData || [];
+
+      expensesSession = {
+        expenses: nextExpenses,
+        categories: nextCategories,
+      };
+
+      setExpenses(nextExpenses);
+      setCategories(nextCategories);
 
       return {
-        expenses: expensesData || [],
-        categories: categoriesData || [],
+        expenses: nextExpenses,
+        categories: nextCategories,
       };
     } catch {
       setError('Failed to load transaction data.');
-      setExpenses([]);
-      setCategories([]);
-      return { expenses: [], categories: [] };
+      if (!hasCache) {
+        expensesSession = null;
+        setExpenses([]);
+        setCategories([]);
+      }
+      return { expenses: expensesSession?.expenses ?? [], categories: expensesSession?.categories ?? [] };
     } finally {
       if (showLoading) setLoading(false);
     }

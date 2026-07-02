@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../../services/firebaseConfig';
 import { getCategoryMeta } from '../../assets/categoryConfig';
-import { useExpenses } from '../../hooks/useExpenses';
-import { useAuthUser } from '../../hooks/useAuthUser';
+import { useExpenses, clearExpensesSession, hasExpensesSession } from '../../hooks/useExpenses';
+import { useAuthUser, clearAuthSession } from '../../hooks/useAuthUser';
 import { useExpenseModal } from '../../hooks/useExpenseModal';
 import { formatMoney } from '../../utils/formatMoney';
 import TopBar from '../../components/common/TopBar';
@@ -24,7 +24,6 @@ const Home = ({ dark, toggleDark }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState('All');
   const navigate = useNavigate();
-  const dataLoaded = useRef(false);
 
   const { user, contactId, loadingAuth, resetSession } = useAuthUser(navigate);
   const {
@@ -42,6 +41,8 @@ const Home = ({ dark, toggleDark }) => {
     editingId,
     formData,
     setFormData,
+    saveError,
+    clearSaveError,
     deleteTarget,
     saving,
     deleting,
@@ -64,11 +65,11 @@ const Home = ({ dark, toggleDark }) => {
   });
 
   useEffect(() => {
-    if (!contactId || loadingAuth || dataLoaded.current) return;
-    dataLoaded.current = true;
+    if (!contactId || loadingAuth) return;
     (async () => {
       const token = await auth.currentUser?.getIdToken();
-      if (token) await loadData(token, { showLoading: true });
+      if (!token) return;
+      await loadData(token, { showLoading: !hasExpensesSession() });
     })();
   }, [contactId, loadingAuth, loadData]);
 
@@ -169,12 +170,13 @@ const Home = ({ dark, toggleDark }) => {
   };
 
   const handleLogout = () => {
-    dataLoaded.current = false;
+    clearExpensesSession();
+    clearAuthSession();
     resetSession();
     auth.signOut();
   };
 
-  if (loadingAuth || loadingExpenses) {
+  if (loadingAuth || (loadingExpenses && expenses.length === 0)) {
     return <PageSkeleton variant="home" />;
   }
 
@@ -255,6 +257,8 @@ const Home = ({ dark, toggleDark }) => {
         onSubmit={handleSubmit}
         saving={saving}
         feedbackTone={modalFeedback}
+        saveError={saveError}
+        onDismissError={clearSaveError}
       />
 
       <ConfirmDialog
