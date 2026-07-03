@@ -4,13 +4,12 @@ const helmet = require('helmet');
 const { errorHandler } = require('./middleware/errorHandler');
 const authRoutes = require('./routes/authRoutes');
 const expenseRoutes = require('./routes/expenseRoutes');
-const { frontendUrl } = require('./config/env');
 
 const app = express();
 
 app.use(helmet());
 app.use(cors({
-  origin: frontendUrl,
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
 }));
 app.use(express.json());
