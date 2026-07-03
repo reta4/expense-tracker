@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const config = {
   port: process.env.PORT || 3001,
-  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
+  frontendUrl: (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/$/, ''),
   salesforce: {
     clientId: process.env.SF_CLIENT_ID,
     clientSecret: process.env.SF_CLIENT_SECRET,

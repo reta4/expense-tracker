@@ -7,9 +7,11 @@ const expenseRoutes = require('./routes/expenseRoutes');
 
 const app = express();
 
+const corsOrigin = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/$/, '');
+
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: corsOrigin,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
 }));
 app.use(express.json());
