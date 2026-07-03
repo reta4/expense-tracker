@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { auth } from './firebaseConfig';
-import { API_BASE } from '../config/api';
+import { API_URL } from '../config/api';
 import { normalizeCategoryValue } from '../utils/categoryNormalize';
 
 export { normalizeCategoryValue };
@@ -60,7 +60,7 @@ const request = async (method, path, { token, data, params, fallback = 'An error
 
   const response = await axios.request({
     method,
-    url: `${API_BASE}${path}`,
+    url: `${API_URL}${path}`,
     headers: getHeaders(authToken),
     data,
     params,
