@@ -115,28 +115,3 @@ body {
     --page-max: 1100px;
   }
 }
-
-@media (max-width: 480px) {
-  .et-btn-logout {
-    min-width: var(--touch-min, 2.75rem);
-    min-height: var(--touch-min, 2.75rem);
-    padding-inline: 0.625rem;
-  }
-
-  .et-btn-logout .app-nav-icon {
-    width: 1.125rem;
-    height: 1.125rem;
-  }
-
-  .et-btn-logout-label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-}

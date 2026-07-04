@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import AppLogo from './AppLogo';
-import { MoonIcon, SunIcon, LogoutIcon } from './NavIcons';
+import { MoonIcon, SunIcon } from './NavIcons';
 
 const TopBar = ({
   user,
@@ -54,8 +54,7 @@ const TopBar = ({
             aria-label="Logout"
             title="Logout"
           >
-            <LogoutIcon />
-            <span className="et-btn-logout-label">Logout</span>
+            Logout
           </button>
         </div>
       </div>

@@ -181,10 +181,6 @@ html[data-theme='dark'] .app-banner-error {
   border-color: rgba(239, 68, 68, 0.2);
 }
 
-.et-btn-logout {
-  position: relative;
-}
-
 .et-btn-danger:hover {
   background: rgba(239, 68, 68, 0.14);
   border-color: rgba(239, 68, 68, 0.35);
