@@ -10,8 +10,12 @@ const DEFAULT_BOTTOM_GAP = 8;
 
 const getBottomReserve = () => {
   const bottomNav = document.querySelector('.app-bottom-nav');
-  const navHeight = bottomNav?.getBoundingClientRect().height ?? 72;
-  return navHeight + DEFAULT_BOTTOM_GAP;
+  const rect = bottomNav?.getBoundingClientRect();
+  if (rect) {
+    const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+    return viewportHeight - rect.top + DEFAULT_BOTTOM_GAP;
+  }
+  return 72 + DEFAULT_BOTTOM_GAP;
 };
 
 const getViewportSize = () => {

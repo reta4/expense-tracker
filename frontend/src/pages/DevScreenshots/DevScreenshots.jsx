@@ -45,7 +45,7 @@ const DevScreenshots = ({ dark, toggleDark }) => {
     { label: 'This month', value: formatMoney(360), sub: '4 transactions', color: '#6366f1', pct: 72 },
     { label: 'Upcoming', value: formatMoney(450), sub: '1 planned', color: '#8b5cf6', pct: 28 },
     { label: 'Top category', value: 'Food', sub: '42% of spending', color: '#6366f1', pct: 42 },
-    { label: 'All records', value: 6, sub: '5 past · 1 future', color: '#10b981', pct: 83 },
+    { label: 'Total expenses', value: 6, sub: '5 past · 1 future', color: '#10b981', pct: 83 },
   ], []);
 
   const processed = useMemo(() => MOCK_EXPENSES.map((exp) => {

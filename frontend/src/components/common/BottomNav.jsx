@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ChartIcon, HomeIcon } from './NavIcons';
 
@@ -8,10 +9,17 @@ const NAV_ITEMS = [
 ];
 
 const BottomNav = () => {
+  const [mounted, setMounted] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
-  return (
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  return createPortal(
     <nav className="app-bottom-nav" aria-label="Main navigation">
       {NAV_ITEMS.map((item) => {
         const isActive = location.pathname === item.path;
@@ -30,7 +38,8 @@ const BottomNav = () => {
           </button>
         );
       })}
-    </nav>
+    </nav>,
+    document.body,
   );
 };
 

@@ -167,7 +167,7 @@ const Home = ({ dark, toggleDark }) => {
         onClick: () => scrollToSection(upcomingSectionRef),
       },
       { label: 'Top category', value: topCatMeta.label, sub: `${topPct}% of spending`, color: topCatMeta.color, pct: topPct },
-      { label: 'All records', value: expenses.length, sub: `${currentExpenses.length} past · ${futureExpenses.length} future`, color: '#10b981', pct: Math.round((currentExpenses.length / (expenses.length || 1)) * 100) },
+      { label: 'Total expenses', value: expenses.length, sub: `${currentExpenses.length} past · ${futureExpenses.length} future`, color: '#10b981', pct: Math.round((currentExpenses.length / (expenses.length || 1)) * 100) },
     ];
   }, [expenses, currentExpenses, futureExpenses, scrollToSection]);
 

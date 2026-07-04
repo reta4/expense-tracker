@@ -1050,8 +1050,9 @@ body.app-fab-dragging .app-fab {
 }
 
 .app-bottom-nav-label {
-  line-height: 1.2;
-  font-size: 0.75rem;
+  line-height: 1.1;
+  font-size: 0.6875rem;
+  letter-spacing: 0.01em;
 }
 
 /* ── Metric cards (Home + Analysis) ── */
