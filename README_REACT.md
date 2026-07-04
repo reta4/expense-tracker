@@ -17,7 +17,7 @@ After sign-in, users can:
 - Open **Analysis** for charts and summary metrics
 - Switch light / dark mode
 
-Routes: **Home** (`/`) and **Analysis** (`/dashboard`), with bottom navigation between them.
+Routes: **Home** (`/`) and **Analysis** (`/analysis`), with bottom navigation between them. Legacy `/dashboard` redirects to `/analysis`.
 
 ---
 
@@ -82,7 +82,7 @@ Firebase email/password:
 - **Forgot password** — Firebase reset email
 - **Logout** — clears session cache and signs out
 
-Protected routes: `/` and `/dashboard`. Unauthenticated users go to `/login`.
+Protected routes: `/` and `/analysis`. Unauthenticated users go to `/login`.
 
 ### Pages
 
