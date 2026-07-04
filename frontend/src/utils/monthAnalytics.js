@@ -23,6 +23,25 @@ export const formatMonthShortLabel = (monthDate, showYear = false) => (
   })
 );
 
+/** Spending change vs last month. Higher spend = negative tone; lower spend = positive. */
+export const getMonthOverMonthTrend = (thisTotal, lastTotal) => {
+  if (lastTotal <= 0) {
+    return { diff: null, label: 'No comparison data for last month', tone: null };
+  }
+
+  const diff = Math.round(((thisTotal - lastTotal) / lastTotal) * 100);
+
+  if (diff === 0) {
+    return { diff: 0, label: 'Stable vs last month', tone: null };
+  }
+
+  return {
+    diff,
+    label: `${diff > 0 ? '+' : ''}${diff}% vs last month`,
+    tone: diff > 0 ? 'negative' : 'positive',
+  };
+};
+
 const aggregateByMonthKey = (processed) => {
   const map = {};
   processed.forEach((entry) => {

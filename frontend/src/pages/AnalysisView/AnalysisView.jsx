@@ -10,6 +10,7 @@ import {
   buildMonthFilterOptions,
   buildTrendChartData,
   getMonthOptionLabel,
+  getMonthOverMonthTrend,
 } from '../../utils/monthAnalytics';
 import TopBar from '../../components/common/TopBar';
 import BottomNav from '../../components/common/BottomNav';
@@ -112,7 +113,7 @@ const AnalysisView = ({ dark, toggleDark }) => {
     const sum = (arr) => arr.reduce((s, e) => s + e.amount, 0);
     const thisTotal = sum(thisMonth);
     const lastTotal = sum(lastMonth);
-    const diff = lastTotal > 0 ? Math.round(((thisTotal - lastTotal) / lastTotal) * 100) : 0;
+    const monthTrend = getMonthOverMonthTrend(thisTotal, lastTotal);
 
     const catMap = {};
     processed.forEach((e) => {
@@ -128,8 +129,8 @@ const AnalysisView = ({ dark, toggleDark }) => {
       {
         label: 'Current Month',
         value: formatMoney(thisTotal),
-        sub: diff === 0 ? 'Stable vs last month' : `${diff > 0 ? '+' : ''}${diff}% vs last month`,
-        subTone: diff > 0 ? 'positive' : diff < 0 ? 'negative' : undefined,
+        sub: monthTrend.label,
+        subTone: monthTrend.tone ?? undefined,
         color: '#6366f1',
         pct: 70,
         delay: '.05s',

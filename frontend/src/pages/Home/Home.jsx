@@ -6,6 +6,7 @@ import { useExpenses, clearExpensesSession, hasExpensesSession } from '../../hoo
 import { useAuthUser, clearAuthSession } from '../../hooks/useAuthUser';
 import { useExpenseModal } from '../../hooks/useExpenseModal';
 import { formatMoney } from '../../utils/formatMoney';
+import { getMonthOverMonthTrend } from '../../utils/monthAnalytics';
 import TopBar from '../../components/common/TopBar';
 import BottomNav from '../../components/common/BottomNav';
 import FabButton from '../../components/common/FabButton';
@@ -112,16 +113,12 @@ const Home = ({ dark, toggleDark }) => {
     const sum = (arr) => arr.reduce((s, e) => s + Number(e.Amount__c), 0);
     const monthTotal = sum(thisMonth);
     const lastTotal = sum(lastMonth);
-    const diff = lastTotal > 0 ? Math.round(((monthTotal - lastTotal) / lastTotal) * 100) : null;
+    const monthTrend = getMonthOverMonthTrend(monthTotal, lastTotal);
 
-    let trendLabel = null;
-    if (thisMonth.length > 0) {
-      if (diff === null) trendLabel = 'No comparison data for last month';
-      else if (diff === 0) trendLabel = 'Stable vs last month';
-      else trendLabel = `${diff > 0 ? '+' : ''}${diff}% vs last month`;
-    }
+    const trendLabel = thisMonth.length > 0 ? monthTrend.label : null;
+    const trendTone = thisMonth.length > 0 ? monthTrend.tone : null;
 
-    return { monthLabel, monthTotal, transactionCount: thisMonth.length, trendLabel };
+    return { monthLabel, monthTotal, transactionCount: thisMonth.length, trendLabel, trendTone };
   }, [currentExpenses]);
 
   const scrollToSection = useCallback((ref) => {
@@ -212,7 +209,7 @@ const Home = ({ dark, toggleDark }) => {
         dark={dark}
         toggleDark={toggleDark}
         onLogout={handleLogout}
-        onNavigateAnalysis={() => navigate('/dashboard')}
+        onNavigateAnalysis={() => navigate('/analysis')}
       />
 
       <MonthlyHero
@@ -220,6 +217,7 @@ const Home = ({ dark, toggleDark }) => {
         total={monthStats.monthTotal}
         transactionCount={monthStats.transactionCount}
         trendLabel={monthStats.trendLabel}
+        trendTone={monthStats.trendTone}
         onAddClick={openAddModal}
       />
 

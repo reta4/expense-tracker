@@ -5,7 +5,7 @@ import { ChartIcon, HomeIcon } from './NavIcons';
 
 const NAV_ITEMS = [
   { path: '/', label: 'Home', Icon: HomeIcon },
-  { path: '/dashboard', label: 'Analysis', Icon: ChartIcon },
+  { path: '/analysis', label: 'Analysis', Icon: ChartIcon },
 ];
 
 const BottomNav = () => {

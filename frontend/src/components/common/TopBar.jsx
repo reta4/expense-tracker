@@ -32,7 +32,7 @@ const TopBar = ({
           {onNavigateAnalysis && (
             <button
               type="button"
-              className={`et-btn et-btn-nav${location.pathname === '/dashboard' ? ' active' : ''}`}
+              className={`et-btn et-btn-nav${location.pathname === '/analysis' ? ' active' : ''}`}
               onClick={onNavigateAnalysis}
             >
               Analysis

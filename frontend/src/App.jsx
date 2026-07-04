@@ -60,7 +60,8 @@ const App = () => {
         <Route path="/register" element={<PublicRoute loading={initializing} user={user}><Register /></PublicRoute>} />
         <Route path="/forgot-password" element={<PublicRoute loading={initializing} user={user}><ForgotPassword /></PublicRoute>} />
         <Route path="/" element={<ProtectedRoute loading={initializing} user={user}><Home {...sharedProps} /></ProtectedRoute>} />
-        <Route path="/dashboard" element={<ProtectedRoute loading={initializing} user={user}><AnalysisView {...sharedProps} /></ProtectedRoute>} />
+        <Route path="/analysis" element={<ProtectedRoute loading={initializing} user={user}><AnalysisView {...sharedProps} /></ProtectedRoute>} />
+        <Route path="/dashboard" element={<Navigate to="/analysis" replace />} />
         {import.meta.env.DEV && DevScreenshots && (
           <Route
             path="/dev/screenshot"

@@ -1,7 +1,7 @@
 import React from 'react';
 import { formatMoney } from '../../utils/formatMoney';
 
-const MonthlyHero = ({ monthLabel, total, transactionCount, trendLabel, onAddClick }) => (
+const MonthlyHero = ({ monthLabel, total, transactionCount, trendLabel, trendTone, onAddClick }) => (
   <section className="et-hero" aria-label="Monthly spending summary">
     <div className="et-hero-glow" aria-hidden="true" />
     <div className="et-hero-content">
@@ -15,7 +15,11 @@ const MonthlyHero = ({ monthLabel, total, transactionCount, trendLabel, onAddCli
         {' '}
         this month
       </p>
-      {trendLabel && <p className="et-hero-trend">{trendLabel}</p>}
+      {trendLabel && (
+        <p className={`et-hero-trend${trendTone ? ` et-hero-trend--${trendTone}` : ''}`}>
+          {trendLabel}
+        </p>
+      )}
     </div>
     {onAddClick ? (
       <button type="button" className="et-btn et-btn-accent et-hero-cta et-hero-cta--visible-mobile" onClick={onAddClick}>

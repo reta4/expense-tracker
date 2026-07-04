@@ -256,8 +256,16 @@ html[data-theme='dark'] .app-banner-error {
 .et-hero-trend {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--text-muted);
   margin-top: 0.375rem;
+}
+
+.et-hero-trend--positive {
+  color: var(--metric-positive);
+}
+
+.et-hero-trend--negative {
+  color: var(--danger);
 }
 
 .et-hero-cta {

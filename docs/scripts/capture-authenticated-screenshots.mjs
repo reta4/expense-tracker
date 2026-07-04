@@ -27,7 +27,7 @@ async function waitForHomeLoaded(page) {
 }
 
 async function waitForAnalysisLoaded(page) {
-  await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'load', timeout: 60_000 });
+  await page.goto(`${BASE_URL}/analysis`, { waitUntil: 'load', timeout: 60_000 });
   await page.waitForFunction(
     () => document.querySelector('.av-page') && !document.querySelector('.app-skeleton'),
     { timeout: 90_000 },
