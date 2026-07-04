@@ -13,7 +13,6 @@ import {
 } from '../../utils/monthAnalytics';
 import TopBar from '../../components/common/TopBar';
 import BottomNav from '../../components/common/BottomNav';
-import FabButton from '../../components/common/FabButton';
 import PageSkeleton from '../../components/common/PageSkeleton';
 import EmptyState from '../../components/common/EmptyState';
 import AnalysisSummary from '../../components/analytics/AnalysisSummary';
@@ -238,11 +237,20 @@ const AnalysisView = ({ dark, toggleDark }) => {
         onNavigateHome={() => navigate('/')}
       />
 
-      <div className="av-toolbar av-toolbar-desktop-only">
-        <button type="button" className="et-btn et-btn-accent" onClick={openAddModal}>
-          Add expense
-        </button>
-      </div>
+      <AnalysisSummary
+        periodLabel={periodLabel}
+        periodTotal={formatMoney(periodTotal)}
+        entryCount={periodEntryCount}
+        filterMonth={filterMonth}
+        filterCategory={filterCategory}
+        onClearMonth={() => setFilterMonth('All')}
+        onClearCategory={() => setFilterCategory('All')}
+        onClearAll={() => {
+          setFilterMonth('All');
+          setFilterCategory('All');
+        }}
+        onAddClick={openAddModal}
+      />
 
       <TransactionModal
         isOpen={isModalOpen}
@@ -256,20 +264,6 @@ const AnalysisView = ({ dark, toggleDark }) => {
         feedbackTone={modalFeedback}
         saveError={saveError}
         onDismissError={clearSaveError}
-      />
-
-      <AnalysisSummary
-        periodLabel={periodLabel}
-        periodTotal={formatMoney(periodTotal)}
-        entryCount={periodEntryCount}
-        filterMonth={filterMonth}
-        filterCategory={filterCategory}
-        onClearMonth={() => setFilterMonth('All')}
-        onClearCategory={() => setFilterCategory('All')}
-        onClearAll={() => {
-          setFilterMonth('All');
-          setFilterCategory('All');
-        }}
       />
 
       <MetricCardGrid metrics={kpis} className="av-metric-grid" />
@@ -314,8 +308,6 @@ const AnalysisView = ({ dark, toggleDark }) => {
           />
         )}
       </div>
-
-      <FabButton onClick={openAddModal} />
 
       <ConfirmDialog
         open={Boolean(deleteTarget)}

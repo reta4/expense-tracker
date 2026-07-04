@@ -18,7 +18,7 @@ const MonthlyHero = ({ monthLabel, total, transactionCount, trendLabel, onAddCli
       {trendLabel && <p className="et-hero-trend">{trendLabel}</p>}
     </div>
     {onAddClick ? (
-      <button type="button" className="et-btn et-btn-accent et-hero-cta" onClick={onAddClick}>
+      <button type="button" className="et-btn et-btn-accent et-hero-cta et-hero-cta--visible-mobile" onClick={onAddClick}>
         <span className="et-hero-cta-icon" aria-hidden="true">+</span>
         Add expense
       </button>

@@ -1083,6 +1083,18 @@ body.app-fab-dragging .app-fab {
   border-color: rgba(99, 102, 241, 0.35);
 }
 
+.app-metric--clickable {
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.app-metric--clickable:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .app-metric-stripe {
   position: absolute;
   top: 0;
@@ -1332,7 +1344,17 @@ body.app-fab-dragging .app-fab {
     padding-inline: 0.625rem;
   }
 
-  .et-hero-cta {
+  .et-hero-cta:not(.et-hero-cta--visible-mobile) {
+    display: none;
+  }
+
+  .et-hero-cta--visible-mobile {
+    display: inline-flex;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .app-fab--mobile-only {
     display: none;
   }
 }

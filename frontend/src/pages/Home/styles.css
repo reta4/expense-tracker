@@ -26,6 +26,10 @@
   overflow: hidden;
 }
 
+.et-col--scroll-target {
+  scroll-margin-top: 1rem;
+}
+
 .et-col-head {
   padding: 14px 16px;
   border-bottom: 1px solid var(--border);

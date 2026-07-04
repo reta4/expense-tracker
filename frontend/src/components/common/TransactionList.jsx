@@ -51,8 +51,9 @@ const TransactionColumn = ({
   emptyActionLabel,
   onEmptyAction,
   isFiltered = false,
+  sectionRef,
 }) => (
-  <div className="et-col">
+  <div className="et-col et-col--scroll-target" ref={sectionRef}>
     <div className="et-col-head">
       <div className="et-col-head-left">
         {title}

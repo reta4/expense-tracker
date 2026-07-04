@@ -118,7 +118,14 @@ body {
 
 @media (max-width: 480px) {
   .et-btn-logout {
+    min-width: var(--touch-min, 2.75rem);
+    min-height: var(--touch-min, 2.75rem);
     padding-inline: 0.625rem;
+  }
+
+  .et-btn-logout .app-nav-icon {
+    width: 1.125rem;
+    height: 1.125rem;
   }
 
   .et-btn-logout-label {

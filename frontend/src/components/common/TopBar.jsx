@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import AppLogo from './AppLogo';
-import { MoonIcon, SunIcon } from './NavIcons';
+import { MoonIcon, SunIcon, LogoutIcon } from './NavIcons';
 
 const TopBar = ({
   user,
@@ -47,7 +47,14 @@ const TopBar = ({
           >
             {dark ? <SunIcon /> : <MoonIcon />}
           </button>
-          <button type="button" className="et-btn et-btn-danger et-btn-logout" onClick={onLogout}>
+          <button
+            type="button"
+            className="et-btn et-btn-danger et-btn-logout"
+            onClick={onLogout}
+            aria-label="Logout"
+            title="Logout"
+          >
+            <LogoutIcon />
             <span className="et-btn-logout-label">Logout</span>
           </button>
         </div>

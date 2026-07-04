@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../../services/firebaseConfig';
 import { getCategoryMeta } from '../../assets/categoryConfig';
@@ -23,6 +23,8 @@ import './styles.css';
 const Home = ({ dark, toggleDark }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState('All');
+  const currentSectionRef = useRef(null);
+  const upcomingSectionRef = useRef(null);
   const navigate = useNavigate();
 
   const { user, contactId, loadingAuth, resetSession } = useAuthUser(navigate);
@@ -122,6 +124,10 @@ const Home = ({ dark, toggleDark }) => {
     return { monthLabel, monthTotal, transactionCount: thisMonth.length, trendLabel };
   }, [currentExpenses]);
 
+  const scrollToSection = useCallback((ref) => {
+    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, []);
+
   const summaryData = useMemo(() => {
     const now = new Date();
     const thisMonth = currentExpenses.filter((e) => {
@@ -144,12 +150,26 @@ const Home = ({ dark, toggleDark }) => {
     const topCatMeta = getCategoryMeta(topName);
 
     return [
-      { label: 'This month', value: formatMoney(monthTotal), sub: `${thisMonth.length} transactions`, color: '#6366f1', pct: allTotal ? Math.round((monthTotal / allTotal) * 100) : 0 },
-      { label: 'Upcoming', value: formatMoney(upTotal), sub: `${futureExpenses.length} planned`, color: '#8b5cf6', pct: upPct },
+      {
+        label: 'This month',
+        value: formatMoney(monthTotal),
+        sub: `${thisMonth.length} transactions`,
+        color: '#6366f1',
+        pct: allTotal ? Math.round((monthTotal / allTotal) * 100) : 0,
+        onClick: () => scrollToSection(currentSectionRef),
+      },
+      {
+        label: 'Upcoming',
+        value: formatMoney(upTotal),
+        sub: `${futureExpenses.length} planned`,
+        color: '#8b5cf6',
+        pct: upPct,
+        onClick: () => scrollToSection(upcomingSectionRef),
+      },
       { label: 'Top category', value: topCatMeta.label, sub: `${topPct}% of spending`, color: topCatMeta.color, pct: topPct },
       { label: 'All records', value: expenses.length, sub: `${currentExpenses.length} past · ${futureExpenses.length} future`, color: '#10b981', pct: Math.round((currentExpenses.length / (expenses.length || 1)) * 100) },
     ];
-  }, [expenses, currentExpenses, futureExpenses]);
+  }, [expenses, currentExpenses, futureExpenses, scrollToSection]);
 
   const isFiltered = Boolean(searchQuery.trim()) || filterCategory !== 'All';
 
@@ -218,6 +238,7 @@ const Home = ({ dark, toggleDark }) => {
 
       <div className="et-cols">
         <TransactionColumn
+          sectionRef={currentSectionRef}
           title="Current expenses"
           badge={<span className="et-badge">{filteredCurrent.length}</span>}
           total={filteredCurrent.length ? formatMoney(currentTotal) : ''}
@@ -231,6 +252,7 @@ const Home = ({ dark, toggleDark }) => {
           isFiltered={isFiltered}
         />
         <TransactionColumn
+          sectionRef={upcomingSectionRef}
           title="Upcoming"
           badge={<span className="et-badge et-badge-up">{filteredFuture.length}</span>}
           total={filteredFuture.length ? formatMoney(futureTotal) : ''}

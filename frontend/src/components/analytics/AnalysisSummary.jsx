@@ -10,6 +10,7 @@ const AnalysisSummary = ({
   onClearMonth,
   onClearCategory,
   onClearAll,
+  onAddClick,
 }) => {
   const displayTotal = periodTotal ?? total;
   const hasFilters = filterMonth !== 'All' || filterCategory !== 'All';
@@ -53,6 +54,12 @@ const AnalysisSummary = ({
           </div>
         )}
       </div>
+      {onAddClick ? (
+        <button type="button" className="et-btn et-btn-accent et-hero-cta et-hero-cta--visible-mobile" onClick={onAddClick}>
+          <span className="et-hero-cta-icon" aria-hidden="true">+</span>
+          Add expense
+        </button>
+      ) : null}
     </section>
   );
 };
